@@ -15,4 +15,10 @@ app.use(exprees.urlencoded({extended:true, limit:"17kb"}))  //extended use for t
 app.use(exprees.static("public")) //in  public we save static imag and things
 app.use(cookieParser());
 
-export default app;     
+//rotes 
+import userRouter from "./routes/user.routes.js"
+
+//routes Declaration 
+app.use("/api/v1/users", userRouter)
+ //http://localhost:800/api/v1/users/register
+export {app};     
