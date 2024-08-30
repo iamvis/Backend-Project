@@ -9,3 +9,4 @@ class apiResponseStructure{
         this.success=statuscode<400
     }
 }
+export {apiResponseStructure}
