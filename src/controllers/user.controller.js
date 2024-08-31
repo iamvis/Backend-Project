@@ -8,6 +8,7 @@ import { apiResponseStructure } from "../utils/apiResponseStructure.js";
 
 
 const registerUser = asyncHandler(async(req, res) =>{
+
     //get user details from frontend
     //validation - not empty
     //check if user already exists: username, email
@@ -23,14 +24,12 @@ const registerUser = asyncHandler(async(req, res) =>{
     console.log("email: ", email);
     
       //validation - not empty
-    if(
-        [fullName, email, username, password].some((field)=>
-        field?.trim()==="")
-    ){  throw new apiErrorStructure(400, "All Feild are required")
-    }
+    if([fullName, email, username, password].some( (field) =>  field?.trim()==="" ) ){ 
+       throw new apiErrorStructure(400, "All Feild are required")
+         }
 
     //check if user already exists: username, email
-    const existedUser=User.findOne({
+    const existedUser = await User.findOne({
         $or:[{username},  {email}]
      })
      if(existedUser){
@@ -38,15 +37,15 @@ const registerUser = asyncHandler(async(req, res) =>{
      }
 
        //check for image , check for avatar
-     const avatarLocalPath=req.files?.avatar[0]?.path;
-     const coverImageLocalPath= req.files?.coverImage[0]?.path;
+     const avatarLocalPath =  req.files?.avatar[0].path;
+     const coverImageLocalPath = req.files?.coverImage[0]?.path;
      if(!avatarLocalPath){
-        throw new apiErrorStructure(400, "Avatar file is required")
+        throw new apiErrorStructure(400, "Avatar path file is required")
      }
     
-    //upload them to cloudinary, avatar
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    //upload them to cloudinary, avatar//
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
     if(!avatar){
         throw new apiErrorStructure(400, "Avatar file is required")
     }
@@ -60,6 +59,8 @@ const registerUser = asyncHandler(async(req, res) =>{
         password,
         username:username.toLowerCase()
      })
+
+      //check for user creation
      const createdUserr = await User.findById(user._id).select(
         "-password  -refreshToken"
      )
@@ -67,7 +68,8 @@ const registerUser = asyncHandler(async(req, res) =>{
      if(!createdUserr){
         throw new apiErrorStructure(500, "something went wrong while regestering")
      }
-
+  
+         //return response
      return res.status(201).json(
         new apiResponseStructure(200, createdUserr, "user regesterd succesfully")
      )
