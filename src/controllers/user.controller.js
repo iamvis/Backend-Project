@@ -37,8 +37,11 @@ const registerUser = asyncHandler(async(req, res) =>{
      }
 
        //check for image , check for avatar
-     const avatarLocalPath =  req.files?.avatar[0].path;
+       console.log("avtar path dhund ra")
+     const avatarLocalPath =  req.files?.avatar[0]?.path;
+     console.log("avtar patha", avatarLocalPath)
      const coverImageLocalPath = req.files?.coverImage[0]?.path;
+     
      if(!avatarLocalPath){
         throw new apiErrorStructure(400, "Avatar path file is required")
      }
@@ -61,17 +64,17 @@ const registerUser = asyncHandler(async(req, res) =>{
      })
 
       //check for user creation
-     const createdUserr = await User.findById(user._id).select(
-        "-password  -refreshToken"
+     const createdUser= await User.findById(user._id).select(
+        "-password -refreshToken"
      )
 
-     if(!createdUserr){
+     if(!createdUser){
         throw new apiErrorStructure(500, "something went wrong while regestering")
      }
   
          //return response
      return res.status(201).json(
-        new apiResponseStructure(200, createdUserr, "user regesterd succesfully")
+        new apiResponseStructure(200, createdUser, "user regesterd succesfully")
      )
 })
 export {registerUser};
